@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+httpx
+openai==3.35.1
+tzdata
+python-dotenv
+sentdm==0.44.0

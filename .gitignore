@@ -1,0 +1,33 @@
+# Python
+
+**pycache**/
+\*.py[cod]
+.venv/
+venv/
+
+# Secrets and environment variables
+
+.env
+.env.\*
+!.env.example
+/running_uvicorn.md
+/content-guide.md
+
+# Local databases and generated data
+
+_.db
+_.sqlite
+\*.sqlite3
+
+# Frontend dependencies and build output
+
+frontend/node_modules/
+frontend/dist/
+/frontend/codie-design-guide.md
+# Backend dependencies and build output
+/backend/campaigns.db
+# Local editor and OS files
+
+.vscode/
+.DS_Store
+Thumbs.db
