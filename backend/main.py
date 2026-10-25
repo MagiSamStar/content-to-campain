@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from models import CampaignCreate, DraftCreate, DraftUpdate, GenerateDraftRequest
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from database import get_connection, initialize_database
 from models import CampaignCreate
 from fastapi import FastAPI, HTTPException
@@ -8,6 +8,8 @@ from ollama_service import generate_text
 from sent_service import send_content_notification
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from rate_limit import generate_rate_limiter, rate_limit, write_rate_limiter
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -143,7 +145,10 @@ def list_drafts(campaign_id: int):
 
     return [dict(row) for row in rows]
 
-@app.patch("/api/drafts/{draft_id}")
+@app.patch(
+    "/api/drafts/{draft_id}",
+    dependencies=[Depends(rate_limit(write_rate_limiter))],
+)
 def update_draft(draft_id: int, draft: DraftUpdate):
     with get_connection() as connection:
         existing = connection.execute(
@@ -208,7 +213,10 @@ def update_draft(draft_id: int, draft: DraftUpdate):
     return result
 
 
-@app.post("/api/drafts/{draft_id}/approve")
+@app.post(
+    "/api/drafts/{draft_id}/approve",
+    dependencies=[Depends(rate_limit(write_rate_limiter))],
+)
 def approve_draft(draft_id: int):
     """Approve a draft and notify Sent once when it first becomes approved."""
     with get_connection() as connection:
@@ -278,7 +286,11 @@ def approve_draft(draft_id: int):
     return result
 
 
-@app.post("/api/campaigns/{campaign_id}/generate", status_code=201)
+@app.post(
+    "/api/campaigns/{campaign_id}/generate",
+    status_code=201,
+    dependencies=[Depends(rate_limit(generate_rate_limiter))],
+)
 def generate_campaign_draft(
     campaign_id: int,
     request: GenerateDraftRequest,
