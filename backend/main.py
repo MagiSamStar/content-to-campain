@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from models import CampaignCreate, DraftCreate, DraftUpdate, GenerateDraftRequest
 from fastapi import Depends, FastAPI
@@ -21,7 +22,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-
+app.add_middleware(
+      CORSMiddleware,
+      allow_origins=[
+          "https://content-to-campain.vercel.app",
+      ],
+      allow_credentials=False,
+      allow_methods=["GET", "POST", "PATCH"],
+      allow_headers=["Content-Type"],
+  )
 @app.get("/api/health")
 def health_check():
     return {
