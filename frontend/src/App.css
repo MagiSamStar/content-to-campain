@@ -580,6 +580,21 @@
   color: #465268;
   font-weight: 600;
   font-size: 12px;
+  position: relative;
+}
+.platform-icon.generating::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 1.5px solid rgba(82, 217, 255, 0.2);
+  border-top-color: var(--accent);
+  border-right-color: rgba(82, 217, 255, 0.72);
+  border-radius: 50%;
+  animation: generation-ring 900ms linear infinite;
+  box-shadow: 0 0 12px rgba(82, 217, 255, 0.32);
+}
+@keyframes generation-ring {
+  to { transform: rotate(360deg); }
 }
 .platform-icon.x {
   font-size: 16px;
@@ -597,6 +612,27 @@
   padding-top: 14px;
   display: grid;
   gap: 8px;
+}
+.generation-status {
+  color: var(--accent);
+  font: 500 10px/1.4 'DM Mono', monospace;
+  letter-spacing: .1px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 2px 2px;
+}
+.generation-status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 9px rgba(82, 217, 255, 0.85);
+  animation: generation-pulse 1s ease-in-out infinite alternate;
+}
+@keyframes generation-pulse {
+  to { opacity: .3; transform: scale(.7); }
 }
 .generate-button {
   background: #f4f5f8;
@@ -989,6 +1025,15 @@
   line-height: 1.45;
   margin: 5px 0 0;
 }
+.sim-bubble a {
+  color: #52d9ff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.sim-bubble a:hover {
+  color: #baf4ff;
+}
 .sim-status {
   display: flex;
   align-items: center;
@@ -1008,6 +1053,12 @@
 }
 .sim-status.failed>span {
   background: #d86c61;
+}
+.sim-status.local {
+  color: #d5b76a;
+}
+.sim-status.local>span {
+  background: #d5b76a;
 }
 .sim-status small {
   margin-left: auto;
@@ -1512,5 +1563,44 @@ body {
 
   .topbar {
     background: rgba(7, 17, 31, 0.92);
+  }
+}
+
+.main-canvas {
+  position: relative;
+  min-height: calc(100vh - 98px);
+  isolation: isolate;
+}
+
+.main-canvas > .alert,
+.main-canvas > .content-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.cursor-laser-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  cursor: default;
+}
+
+.cursor-laser-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-laser-layer {
+    display: none;
+  }
+
+  .platform-icon.generating::after,
+  .generation-status-dot {
+    animation: none;
   }
 }

@@ -25,7 +25,7 @@ app = FastAPI(
 app.add_middleware(
       CORSMiddleware,
       allow_origins=[
-          "https://content-to-campain.vercel.app",
+          " http://localhost:5173/","https://content-to-campain.vercel.app"
       ],
       allow_credentials=False,
       allow_methods=["GET", "POST", "PATCH"],

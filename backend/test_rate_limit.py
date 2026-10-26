@@ -1,9 +1,16 @@
 import unittest
 
+import rate_limit
 from rate_limit import SlidingWindowRateLimiter
 
 
 class SlidingWindowRateLimiterTests(unittest.TestCase):
+    def test_generation_and_write_limiters_use_separate_defaults(self):
+        self.assertEqual(rate_limit.generate_rate_limiter.limit, 3)
+        self.assertEqual(rate_limit.generate_rate_limiter.window_seconds, 86400)
+        self.assertEqual(rate_limit.write_rate_limiter.limit, 20)
+        self.assertEqual(rate_limit.write_rate_limiter.window_seconds, 60)
+
     def test_allows_requests_until_limit(self):
         now = [100.0]
         limiter = SlidingWindowRateLimiter(2, 60, clock=lambda: now[0])

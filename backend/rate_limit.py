@@ -19,8 +19,9 @@ def _read_positive_int(name: str, default: int) -> int:
     return parsed if parsed > 0 else default
 
 
-WINDOW_SECONDS = _read_positive_int("RATE_LIMIT_WINDOW_SECONDS", 60)
-GENERATE_LIMIT = _read_positive_int("RATE_LIMIT_GENERATE_PER_WINDOW", 5)
+GENERATE_WINDOW_SECONDS = _read_positive_int("RATE_LIMIT_GENERATE_WINDOW_SECONDS", 86400)
+GENERATE_LIMIT = _read_positive_int("RATE_LIMIT_GENERATE_PER_WINDOW", 3)
+WRITE_WINDOW_SECONDS = _read_positive_int("RATE_LIMIT_WRITE_WINDOW_SECONDS", 60)
 WRITE_LIMIT = _read_positive_int("RATE_LIMIT_WRITE_PER_WINDOW", 20)
 
 
@@ -76,5 +77,5 @@ def rate_limit(limiter: SlidingWindowRateLimiter):
     return dependency
 
 
-generate_rate_limiter = SlidingWindowRateLimiter(GENERATE_LIMIT, WINDOW_SECONDS)
-write_rate_limiter = SlidingWindowRateLimiter(WRITE_LIMIT, WINDOW_SECONDS)
+generate_rate_limiter = SlidingWindowRateLimiter(GENERATE_LIMIT, GENERATE_WINDOW_SECONDS)
+write_rate_limiter = SlidingWindowRateLimiter(WRITE_LIMIT, WRITE_WINDOW_SECONDS)
