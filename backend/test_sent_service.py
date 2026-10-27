@@ -1,20 +1,40 @@
+import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
-from sent_service import send_content_notification
+import sent_service
 
 
-try:
-    response = send_content_notification(
-        "Test notification from Content-to-Campaign Pipeline"
+class SentServiceTests(unittest.TestCase):
+    @patch.dict(
+        sent_service.os.environ,
+        {
+            "SENT_TEMPLATE_ID": "template-id",
+            "SENT_TEST_PHONE": "+15555555555",
+        },
+        clear=False,
     )
+    @patch("sent_service.Sent")
+    def test_notifications_are_always_sandboxed(self, sent_class):
+        sent_class.return_value.messages.send.return_value = SimpleNamespace(
+            data=SimpleNamespace(
+                status="accepted",
+                recipients=[SimpleNamespace(message_id="message-id")],
+            )
+        )
 
-    print("Sandbox validation completed.")
-    print("Status:", response.data.status)
+        result = sent_service.send_content_notification("Review this draft")
 
-    recipients = response.data.recipients
-    if recipients:
-        print("Message ID:", recipients[0].message_id)
+        self.assertEqual(result, {"status": "accepted", "message_id": "message-id"})
+        sent_class.return_value.messages.send.assert_called_once_with(
+            to=["+15555555555"],
+            template={
+                "id": "template-id",
+                "parameters": {"contentTitle": "Review this draft"},
+            },
+            sandbox=True,
+        )
 
-except Exception as error:
-    print("Sent sandbox test failed.")
-    print("Error type:", type(error).__name__)
-    print("Check your configuration and Sent API response.")
+
+if __name__ == "__main__":
+    unittest.main()

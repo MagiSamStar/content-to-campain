@@ -52,11 +52,26 @@ class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '')
+  .trim()
+  .replace(/\/$/, '')
+
+const isPlaceholderApiUrl =
+  API_BASE_URL === 'https://your-backend.onrender.com'
+
+function apiUrl(path: string) {
+  if (isPlaceholderApiUrl) {
+    throw new Error(
+      'The frontend API URL is still a placeholder. Set VITE_API_BASE_URL to the deployed backend URL and rebuild the frontend.',
+    )
+  }
+
+  return `${API_BASE_URL}${path}`
+}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
+    const response = await fetch(apiUrl(path), {
       headers: {
         'Content-Type': 'application/json',
         ...options?.headers,
